@@ -75,7 +75,7 @@
                             <properties>
                                 <piranha.version>${project.version}</piranha.version>
                             </properties>
-                            <goals>clean install -DskipTests -pl -:helidon-webserver-tyrus -pl -:helidon-microprofile-websocket</goals>
+                            <goals>clean source:jar install -DskipTests -pl -:helidon-webserver-tyrus -pl -:helidon-microprofile-websocket</goals>
                         </configuration>
                     </execution>
                 </executions>

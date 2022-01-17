@@ -4,17 +4,24 @@
 
     <groupId>org.omnifaces</groupId>
     <artifactId>omni-mp-config</artifactId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.0.0</version>
     <packaging>jar</packaging>
 
     <name>Omni MP Config</name>
-    <description></description>
+    <description>Implementation of MicroProfile Config using Helidon.</description>
     <url>http://omnifaces.org</url>
+    <inceptionYear>2022</inceptionYear>
     <organization>
         <name>OmniFaces</name>
         <url>http://omnifaces.org</url>
     </organization>
-    <inceptionYear>2022</inceptionYear>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
     <developers>
         <developer>
@@ -24,20 +31,11 @@
         </developer>
     </developers>
 
-    <licenses>
-        <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
-
     <scm>
-        <url>https://github.com/omnifaces/omnifaces</url>
-        <connection>scm:git:git://github.com/omnifaces/omnifaces.git</connection>
-        <developerConnection>scm:git:git@github.com:omnifaces/omnifaces.git</developerConnection>
+        <url>https://github.com/omnifaces/omniconfig</url>
+        <connection>scm:git:git://github.com/omnifaces/omniconfig.git</connection>
+        <developerConnection>scm:git:git@github.com:omnifaces/omniconfig.git</developerConnection>
     </scm>
-
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
@@ -53,7 +51,7 @@
         <maven.compiler.target>17</maven.compiler.target>
         <maven.source.excludeResources>true</maven.source.excludeResources>
     </properties>
-    
+
     <dependencies>
         <dependency>
             <groupId>io.helidon.microprofile.config</groupId>
@@ -87,8 +85,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.9.0</version>
             </plugin>
-            
-             <!-- Configure the jar with the binaries. -->
+            <!-- Configure the jar with the binaries. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -106,7 +103,6 @@
                     </archive>
                 </configuration>
             </plugin>
-
             <plugin>
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.2.4</version>
@@ -118,6 +114,8 @@
                         </goals>
                         <configuration>
                             <createDependencyReducedPom>true</createDependencyReducedPom>
+                            <createSourcesJar>true</createSourcesJar>
+                            <shadeSourcesContent>true</shadeSourcesContent>
                             <artifactSet>
                                 <includes>
                                     <include>io.helidon.microprofile.config:*:*</include>
@@ -126,10 +124,9 @@
                                     <include>org.yaml:*:*</include>
                                 </includes>
                             </artifactSet>
-
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformer" />
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformer"/>
                             </transformers>
                         </configuration>
                     </execution>
@@ -138,6 +135,7 @@
             <plugin>
                 <groupId>org.moditect</groupId>
                 <artifactId>moditect-maven-plugin</artifactId>
+                <version>1.0.0.RC2</version>
                 <executions>
                     <execution>
                         <id>add-module-infos</id>
@@ -158,7 +156,9 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>flatten-maven-plugin</artifactId>
                 <version>1.2.2</version>
-                <configuration></configuration>
+                <configuration>
+                    <flattenMode>ossrh</flattenMode>
+                </configuration>
                 <executions>
                     <execution>
                         <id>flatten</id>
@@ -166,6 +166,23 @@
                         <goals>
                             <goal>flatten</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>au.com.acegi</groupId>
+                <artifactId>xml-format-maven-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>xml-format</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>xml-format</goal>
+                        </goals>
+                        <configuration>
+                            <indentSize>4</indentSize>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -183,23 +200,6 @@
                     </execution>
                 </executions>
             </plugin>
-           
-
-            <!-- Configure the jar with the sources. -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>3.2.1</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar-no-fork</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
             <!-- Configure the jar with the javadoc. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -220,7 +220,6 @@
                     </execution>
                 </executions>
             </plugin>
-
             <!-- Configure snapshot deployment to Sonatype. -->
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
@@ -232,18 +231,23 @@
                     <nexusUrl>https://oss.sonatype.org/</nexusUrl>
                     <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.thoughtworks.xstream</groupId>
+                        <artifactId>xstream</artifactId>
+                        <version>1.4.15</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>
 
     <profiles>
-
         <!-- Release deploy: mvn clean deploy -P release -->
         <profile>
             <id>release</id>
             <build>
                 <plugins>
-
                     <!-- Signing with GPG is a requirement for a release deployment to Maven central. -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
@@ -263,5 +267,4 @@
             </build>
         </profile>
     </profiles>
-
 </project>
